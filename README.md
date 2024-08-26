@@ -1,1 +1,1 @@
-# CHOIR_clinical_trials
+# CHOIR: clinical trials
