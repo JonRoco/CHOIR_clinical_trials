@@ -1,0 +1,61 @@
+---
+title: "MOSAIC: sample size justification"
+format: html
+editor: visual
+embed-resources: true
+editor_options: 
+  chunk_output_type: console
+df-print: paged
+
+---
+
+## Sample Size Justification
+
+In this parallel-group randomised trial, log-fold change (LFC) in peripheral blood VAF from baseline is the primary endpoint.
+
+We anticipate that the placebo group will have on average no reduction in VAF (LFC = 0), compared with the intervention group with an average of 25% reduction in VAF (LFC = log (0.75)).
+
+We assume that the LFC in VAF is approximately normally distributed. Under an exponential growth model : VAF(t)= c0 exp(rt), where t is time in years and r is the annual growth rate, the LFC at one-year post-baseline simplifies to log (VAF (1)/VAF (0)) = r. Based on Fabre et al. (2020), which characterised the longitudinal dynamics of CH, we estimated the within group LFC standard deviation to be 35%.
+
+Under these assumptions, with a 2:1 randomisation and accounting for 10% attrition, 60 participants (40 Dec+THU, 20 placebo) provide at least 80% power to detect a 25% relative reduction in VAF using a two-sided significance of 0.05.
+
+## Sample Size Estimation
+
+Sample size calculation for a two-group comparison with unequal allocation.
+
+$$ n_2 = \frac{(z_{\alpha/2} + z_{\beta})^2}{d^2} \cdot \left( 1 + \frac{1}{k} \right) $$ $$ n_1 = kn_2$$
+
+```{r}
+#| message: false
+#| warning: false
+
+library(tidyverse)
+
+sample_size_fn1 <- function(alpha = 0.05, power = 0.8, ratio, ratio.sd, k = 2) {
+  effect_size <- abs(log(ratio) / ratio.sd)
+
+  z_alpha <- qnorm(1 - alpha / 2)
+
+  z_beta <- qnorm(power)
+  n2 <- ceiling((1 + 1 / k) * (z_alpha + z_beta)^2 / effect_size^2)
+  n1 <- k * n2
+
+  tibble(n1, n2)
+}
+
+
+```
+
+```{r}
+sz <- sample_size_fn1(power = 0.8, ratio = 0.75, ratio.sd = 0.35)
+sz
+
+```
+
+Considering 10% attrition:
+
+```{r}
+sz/0.9
+
+```
+
